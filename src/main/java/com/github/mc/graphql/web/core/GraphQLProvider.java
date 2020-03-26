@@ -55,8 +55,10 @@ public class GraphQLProvider {
         String sdl;
         try {
             sdl = IOUtils.toString(is);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Unable to load file SDL: " + graphQLProperties.getSdlPath());
+        } catch (IOException e) {
+            String message = "Unable to load file SDL: " + graphQLProperties.getSdlPath();
+            logger.error(message);
+            throw new RuntimeException(message);
         }
 
         TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
@@ -81,7 +83,7 @@ public class GraphQLProvider {
             }else {
                 IOUtils.write(sdl.getBytes(), new FileOutputStream(resource + sdlPath));
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -4,25 +4,21 @@ import java.io.*;
 
 public class IOUtils {
 
-    public static void write(byte[] bytes, OutputStream os) {
+    public static void write(byte[] bytes, OutputStream os) throws IOException {
         try (BufferedOutputStream bos = new BufferedOutputStream(os)){
             bos.write(bytes);
-        }catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    public static String toString(InputStream in) throws UnsupportedEncodingException {
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        try (BufferedInputStream bin = new BufferedInputStream(in)){
-            while ((length = bin.read(buffer)) != -1) {
-                result.write(buffer, 0, length);
+    public static String toString(InputStream is) throws IOException {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+             BufferedInputStream bis = new BufferedInputStream(is)){
+            byte[] bs = new byte[1024];
+            int ch;
+            while ((ch = bis.read(bs)) != -1) {
+                os.write(bs, 0, ch);
             }
-        }catch (IOException e) {
-            e.printStackTrace();
+            return os.toString();
         }
-        return result.toString("UTF-8");
     }
 }
