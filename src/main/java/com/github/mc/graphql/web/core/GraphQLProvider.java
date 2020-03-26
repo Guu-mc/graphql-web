@@ -56,9 +56,7 @@ public class GraphQLProvider {
         try {
             sdl = IOUtils.toString(is);
         } catch (IOException e) {
-            String message = "Unable to load file SDL: " + graphQLProperties.getSdlPath();
-            logger.error(message);
-            throw new RuntimeException(message);
+            throw new RuntimeException("Unable to load file SDL: " + graphQLProperties.getSdlPath());
         }
 
         TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
