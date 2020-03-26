@@ -1,16 +1,22 @@
 package com.github.mc.graphql.web.handle;
 
 import com.github.mc.graphql.web.core.TypeHandle;
+import graphql.schema.GraphQLScalarType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Date;
+import java.util.List;
 
 @Component
 public class DefaultTypeHandle implements TypeHandle {
+
+    @Autowired
+    private List<GraphQLScalarType> scalarTypes;
+
     @Override
     public String javaToGraphqlType(Class<?> type) {
         String graphqlType;
@@ -40,6 +46,10 @@ public class DefaultTypeHandle implements TypeHandle {
     @Override
     public boolean isNeedDefineType(Class<?> type) {
         String name = type.getName();
+        for (GraphQLScalarType scalarType : scalarTypes) {
+            if(name.endsWith("." + scalarType.getName())) return false;
+        }
+
         return !"byte".equals(name) && !Byte.class.getName().equals(name) &&
                 !"short".equals(name) && !Short.class.getName().equals(name) &&
                 !"int".equals(name) && !Integer.class.getName().equals(name) &&
@@ -48,7 +58,7 @@ public class DefaultTypeHandle implements TypeHandle {
                 !"double".equals(name) && !Double.class.getName().equals(name) &&
                 !"boolean".equals(name) && !Boolean.class.getName().equals(name) &&
                 !"char".equals(name) && !Character.class.getName().equals(name) &&
-                !String.class.getName().equals(name) && !Date.class.getName().equals(name);
+                !String.class.getName().equals(name);
     }
 
     @Override

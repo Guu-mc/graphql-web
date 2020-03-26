@@ -45,18 +45,17 @@ public class GraphQLProvider {
                 graphQLProperties.getSdlPath().trim().isEmpty()) {
             throw new RuntimeException("sdlPath or sdl-path not empty");
         }
-
-        if(graphQLProperties.getSdlCreate()) {
-            initSDL(mappers);
-        }
-        InputStream is = getClass()
-                .getClassLoader()
-                .getResourceAsStream(graphQLProperties.getSdlPath());
         String sdl;
-        try {
-            sdl = IOUtils.toString(is);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load file SDL: " + graphQLProperties.getSdlPath());
+        if(graphQLProperties.getSdlCreate()) {
+            sdl = initSDL(mappers);
+        }else {
+            try {
+                sdl = IOUtils.toString(getClass()
+                        .getClassLoader()
+                        .getResourceAsStream(graphQLProperties.getSdlPath()));
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to load file SDL: " + graphQLProperties.getSdlPath());
+            }
         }
 
         TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
@@ -66,11 +65,12 @@ public class GraphQLProvider {
         this.graphQL = GraphQL.newGraphQL(graphQLSchema).build();
     }
 
-    public void initSDL(List<MapperHandle.Mapper> mappers) {
+    public String initSDL(List<MapperHandle.Mapper> mappers) {
         String sdl = sdlHandle.sdl(mappers);
         String sdlPath = graphQLProperties.getSdlPath();
         //输出SDL文件
         outputSDL(sdl, sdlPath);
+        return sdl;
     }
 
     private void outputSDL(String sdl, String sdlPath) {
